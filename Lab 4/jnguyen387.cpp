@@ -2,47 +2,74 @@
 #include <climits>
 using namespace std;
 
-int max_crossing(int* arr, int low, int mid, int high){
-  int left_sum = INT_MIN;
-  int sum = 0;
-  // finish ...
-
-  int right_sum = INT_MIN;
-  int sum = 0;
-  // finish ...
-
-  return left_sum + right_sum;
+void fillingArray(int* maxArray, int sizeOfArray){
+    int newElement;
+     for(int i = 0; i < sizeOfArray; i++){
+        cin >> newElement;
+        maxArray[i] = newElement;
+    }
 }
 
-int max_subarray(int* arr, int low, int high){
-  if (low == high){
-    return arr[low];
-  }
-  int mid = (low + high) / 2;
-  int left_sum = max_subarray(arr, low, mid);
-  int right_sum = max_subarray(arr, mid+1, high);
-  int cross_sum = max_crossing(arr, low, mid, high);
-  
-  if (left_sum >= right_sum && left_sum >= cross_sum){
-    return left_sum;
-  }
-  // finish...
+int maxCrossingArray(int* maxArray, int beginning, int middle, int end){
+    int leftSum = INT_MIN;
+    int rightSum = INT_MIN;
+    int tempSum = 0;
 
+    for(int i = middle; i >= beginning; i--){
+        tempSum = tempSum + maxArray[i];
+
+        if(tempSum > leftSum){
+            leftSum = tempSum;
+        }
+    }
+
+    tempSum = 0;
+
+    for(int j = middle + 1; j <= end; j++){
+        tempSum = tempSum + maxArray[j];
+
+        if(tempSum > rightSum){
+            rightSum = tempSum;
+        }
+    }
+
+    return leftSum + rightSum;
+}
+
+int maxSubArray(int* maxArray, int beginning, int end){
+    if(beginning == end){
+        return maxArray[beginning];
+    } 
+
+    int middle = (beginning + end)/2;
+    int leftSum = maxSubArray(maxArray, beginning, middle);
+    int rightSum = maxSubArray(maxArray, middle + 1, end);
+    int crossSum = maxCrossingArray(maxArray, beginning, middle, end);
+
+    if(leftSum >= rightSum && leftSum >= crossSum){
+        return leftSum;
+    } else if(rightSum >= leftSum && rightSum >= crossSum){
+        return rightSum;
+    } else{
+        return crossSum;
+    }   
 }
 
 int main(){
-  
-  int n;
-  cin>>n;
 
-  int* arr = new int[n];
-  for(int i = 0; i < n; i++){
-    cin>>arr[i];
-  }
+    int sizeOfArray;
+    cin >> sizeOfArray;
 
-  // maybe just n not (n-1)?
-  int max_sum = max_subarray(arr, 0, n-1);
-  cout<<max_sum;
+    int *maxArray = new int[sizeOfArray];      
 
-  return 0;
+    fillingArray(maxArray, sizeOfArray);
+
+    int beginning = 0;
+    int end = sizeOfArray - 1;
+
+    int maxSum = maxSubArray(maxArray, beginning, end);
+
+    cout<<maxSum;
+
+    return 0;
 }
