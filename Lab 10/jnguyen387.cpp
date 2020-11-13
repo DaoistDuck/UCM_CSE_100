@@ -3,7 +3,11 @@
 const int m = 13;
 
 int hashFunction(int key, int i){
-   return key % m;
+    int h1 = key % m;
+    int h2 = 1 + (key % 11);
+    int h3 = (h1 + (i * h2)) % m;
+
+    return h3;
 }
 
 int main(){
@@ -23,15 +27,12 @@ int main(){
         // 1. calc hash function
         for(int i = 0; i < m; i++){
             int h = hashFunction(key,i);
-            if(Table[h] == -1){
-                break;
-            }
-            Table[h] = key;
-        }
-        
-        
+            if(Table[h] == -1 || Table[h] == -2){
+                Table[h] = key;
+                break;   
+            }         
+        }               
         //2. put it into hash table
-
         std::cin >> key;
     }
 
@@ -50,15 +51,22 @@ int main(){
     //Key Searching
     std::cin >> key;
     while(key != -2){
+        int index = -1;
         // 1. calc hash function
         for(int i = 0; i < m; i++){
             int h = hashFunction(key,i);
-            if(Table[h] == -1){
-                break;
+            if(Table[h] == key){
+               index = h;
+               break;
             }
-            Table[h] = key;
+            
         }
         //2. search the key in the hash table, print either index or message NOT_FOUND
+        if(index != -1){
+            std::cout<< index << std::endl;
+        } else{
+            std::cout << "NOT_FOUND" << std::endl;
+        }
         
         std::cin >> key;
     }
@@ -71,10 +79,11 @@ int main(){
         // 1. calc hash function
         for(int i = 0; i < m; i++){
             int h = hashFunction(key,i);
-            if(Table[h] == -1){
+            if(Table[h] == key){
+                Table[h] = -2;
                 break;
             }
-            Table[h] = key;
+            
         }
         //2. delete a key from your hash table
         
