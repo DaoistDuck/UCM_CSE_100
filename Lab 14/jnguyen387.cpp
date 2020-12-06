@@ -2,59 +2,11 @@
 #include <vector>
 #include <queue>
 #include <functional>
-#include <climits>
+#include <algorithm>
 
-std::vector<int> bitholder;
-std::vector<int> tmpbitholder;
-int oneLocation = 0;
+std::vector<int> bitCodeHolder;
 
-//https://stackoverflow.com/questions/15643319/how-can-i-create-min-stl-priority-queue-of-node-structure-type
-
-/*
-    while(counter != 0){
-        for(int i = 0; i < bitholder.size();i++){    
-            if(c[matchingIndex] == 1){
-                matchingLocation = oneLocation + 1;
-                bitLocation[positionIndex] = matchingLocation;
-                //std::cout<<matchingLocation<<std::endl;
-                matchingIndex++;
-                positionIndex++;
-            }   
-            if(c[matchingIndex] == bitholder[i]){
-                //std::cout<<bitholder[i];
-                matchingLocation = i + 1;
-                bitLocation[positionIndex] = matchingLocation;
-                //std::cout<<matchingLocation<<std::endl;
-                matchingIndex++; 
-                positionIndex++;   
-            }           
-        }
-        counter--;
-    }
-
-    for(int i = 0; i < n; i++){
-        //std::cout<<bitLocation[i] << " ";
-    }
-    //std::cout<<std::endl;
-
-    int it = 0;
-    int positionLocation = 0;
-        
-    while(printingCounter != 0){
-        positionLocation = bitLocation[it];
-        
-        for(int i = positionLocation; i < bitholder.size(); i++){
-            if(bitholder[i] == -1){
-                break;
-            }
-            std::cout<<bitholder[i];
-        }
-        std::cout<<"\n";
-
-        it++;
-        printingCounter--;
-    }
-    */
+//https://stackoverflow.com/questions/15643319/how-can-i-create-min-stl-priority-queue-of-node-structure-type this showed me how to use priority min queue, but for nodes
 
 struct Node{
     int freq;
@@ -70,46 +22,35 @@ struct Node{
 
 struct Compare{
     bool operator()(Node* l, Node* r){
-        return (l->freq >= r->freq);
+        return (l->freq > r->freq);
     }
 };
 
-void printBits(int*b, int location, int tmp){
-    
-    
-    bitholder.push_back(-1);
-    if(tmp == 1){
-        oneLocation = bitholder.size();
-    }     
-     
-    bitholder.push_back(tmp);
-     
-     
-    
+void printBits(int*b, int location, int tmp){   
+    bitCodeHolder.push_back(-1); // puts a placeholder to find this freq 
+    bitCodeHolder.push_back(tmp);
+       
     for(int i = 0; i < location; i++){
-        bitholder.push_back(b[i]);
-    }
-    for(int j = 0; j < bitholder.size(); j++){
-            //std::cout<<bitholder[j]<< " ";
-        }
-        //std::cout<<std::endl;
-    
+        bitCodeHolder.push_back(b[i]);
+    }      
 }
 
-void printHuffmanCode(Node* root, int* b, int location){
-    int tmp;
+void placeHuffmanCodeIntoVector(Node* root, int* b, int location){  //this puts 0 or 1 into b array if you are traveling left or right on the tree and prints out the binary code if the node is a leaf node
+    
+    if(root == nullptr){
+        return;
+    }
+     if(root->isLeaf == true){
+        printBits(b, location,root->freq);
+    } 
     if(root->left){
-        b[location] = 0;
-        printHuffmanCode(root->left,b,location+1);
+        b[location] = 0;                              
+        placeHuffmanCodeIntoVector(root->left,b,location+1);
     }
     if(root->right){
         b[location] = 1;
-        printHuffmanCode(root->right, b,location+1);   
-    }   
-   
-    if(root->isLeaf == true){
-        printBits(b, location,root->freq);
-    }               
+        placeHuffmanCodeIntoVector(root->right, b,location+1);   
+    }                  
 }
 
 Node* huffmanCode(int* c, int n){
@@ -133,13 +74,9 @@ Node* huffmanCode(int* c, int n){
 
 
 int main(){
-
     int n;
-
     std::cin>>n;
-
     int c[n];
-
     int counter = 0;
 
     for(int i = 0; i < n; i++){
@@ -147,78 +84,33 @@ int main(){
         counter++;      
     }
     
-    int size = sizeof(c)/sizeof(c[0]);    
-
-    Node* code = huffmanCode(c,size);
-
-    std::string bit = "";
-
-    int b[n];
-
+    int size = sizeof(c)/sizeof(c[0]);  
+    Node* rootPointer = huffmanCode(c,size);
+    int bits[n];
     int leafLocation = 0;
-
-    printHuffmanCode(code, b, leafLocation);
+    placeHuffmanCodeIntoVector(rootPointer, bits, leafLocation);    
 
     int matchingIndex = 0;
-    int positionIndex = 0;
-    int matchingLocation = 0;
-
-    tmpbitholder = bitholder;
-
-    for(int j = 0; j < bitholder.size(); j++){
-            std::cout<<bitholder[j]<< " ";
-        }
-        std::cout<<std::endl;
-    int printingCounter = counter;
-
-    int bitLocation[n];
+    int tmpIndex = 0;
+    std::vector<int>::iterator it;
+    int endPositionLocation = 0;
 
     while(counter != 0){
-        for(int i = 0; i < tmpbitholder.size();i++){    
-            if(c[matchingIndex] == 1){
-                matchingLocation = oneLocation + 1;
-                bitLocation[positionIndex] = matchingLocation;
-                //std::cout<<matchingLocation<<std::endl;
-                matchingIndex++;
-                positionIndex++;
-            }   
-            if(c[matchingIndex] == tmpbitholder[i]){
-                //std::cout<<tmpbitholder[i];
-                matchingLocation = i + 1;
-                bitLocation[positionIndex] = matchingLocation;
-                //std::cout<<matchingLocation<<std::endl;
-                matchingIndex++; 
-                positionIndex++;   
-            }           
-        }
-        counter--;
-    }
+        it = std::find(bitCodeHolder.begin(),bitCodeHolder.end(), c[tmpIndex]); // goes through the vector to find where c[tmpIndex] is
 
-    for(int i = 0; i < n; i++){
-        std::cout<<bitLocation[i] << " ";
-    }
-    std::cout<<std::endl;
+        matchingIndex = std::distance(bitCodeHolder.begin(), it) + 1;
 
-    int it = 0;
-    int positionLocation = 0;
-    int endPositionLocation = 0;
-        
-    while(printingCounter != 0){
-        positionLocation = endPositionLocation = bitLocation[it];
-        
-        for(int i = positionLocation; i < tmpbitholder.size(); i++){
-            if(tmpbitholder[i] == -1){
+        for(int i = matchingIndex; i < bitCodeHolder.size(); i++){            
+            if(bitCodeHolder[i] == -1){
                 endPositionLocation = i;
-                //std::cout<<endPositionLocation;
+                bitCodeHolder.erase(bitCodeHolder.begin() + matchingIndex - 2, bitCodeHolder.begin() + endPositionLocation); // after printing out the bits, delete the -1, the freq, and the bits
                 break;
-            }
-            std::cout<<tmpbitholder[i];
-        }
-        std::cout<<"\n";
-        it++;
-        printingCounter--;
-    }
-  
-
+            }                    
+            std::cout<< bitCodeHolder[i];
+        }        
+        std::cout<<std::endl;           
+        tmpIndex++;
+        counter--;
+    }    
     return 0;
 }
