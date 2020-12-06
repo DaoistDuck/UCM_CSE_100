@@ -35,7 +35,7 @@ void printBits(int*b, int location, int tmp){
     }      
 }
 
-void placeHuffmanCodeIntoVector(Node* root, int* b, int location){  //this puts 0 or 1 into b array if you are traveling left or right on the tree and stores the binary code into a vector if the node is a leaf node
+void placeHuffmanCodeIntoVector(Node* root, int* b, int location){  //this puts 0 or 1 into b array if you are traveling left or right on the tree and prints out the binary code if the node is a leaf node
     
     if(root == nullptr){
         return;
@@ -92,19 +92,18 @@ int main(){
 
     int matchingIndex = 0;
     int tmpIndex = 0;
+    std::vector<int>::iterator it;
     int endPositionLocation = 0;
 
     while(counter != 0){
-        for(int i = 0; i < bitCodeHolder.size();i++){
-            if(c[tmpIndex] == bitCodeHolder[i] && bitCodeHolder[i-1] == -1){
-                matchingIndex = i + 1;
-            }
-        }
+        it = std::find(bitCodeHolder.begin(),bitCodeHolder.end(), c[tmpIndex]); // goes through the vector to find where c[tmpIndex] is
+
+        matchingIndex = std::distance(bitCodeHolder.begin(), it) + 1;
 
         for(int i = matchingIndex; i < bitCodeHolder.size(); i++){            
             if(bitCodeHolder[i] == -1){
                 endPositionLocation = i;
-                bitCodeHolder.erase(bitCodeHolder.begin() + matchingIndex - 2, bitCodeHolder.begin() + endPositionLocation); // after printing out the bits, delete the -1, the freq, and the bits associated with the freq
+                bitCodeHolder.erase(bitCodeHolder.begin() + matchingIndex - 2, bitCodeHolder.begin() + endPositionLocation); // after printing out the bits, delete the -1, the freq, and the bits
                 break;
             }                    
             std::cout<< bitCodeHolder[i];
